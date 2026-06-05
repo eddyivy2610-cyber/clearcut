@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Docs - Clear Cut</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            'cc-bg': '#f3f4f6',
+            'cc-dark-bg': '#111827',
+            'cc-pill': '#ffffff',
+            'cc-dark-pill': '#1f2937',
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      background-color: theme('colors.cc-bg');
+      background-image: url('/static/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .dark body {
+      background-color: theme('colors.cc-dark-bg');
+      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+
+<body class="text-gray-900 dark:text-gray-100 min-h-screen flex transition-colors duration-300">
+  
+  <!-- Left/Bottom Navigation Pill -->
+  <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:bottom-auto sm:left-4 sm:translate-x-0 sm:top-1/2 sm:-translate-y-1/2 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-full shadow-lg p-3 flex flex-row sm:flex-col gap-4 sm:gap-6 z-50 border border-white/30 dark:border-gray-700/50">
+    <a href="/" class="p-3 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" title="Home">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+    </a>
+    <a href="/api-docs" class="p-3 rounded-full bg-black text-white dark:bg-white dark:text-black shadow-md transition-colors" title="API Docs">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+    </a>
+    <div class="hidden sm:block h-px w-full bg-gray-200 dark:bg-gray-700"></div>
+    <div class="block sm:hidden w-px h-full bg-gray-200 dark:bg-gray-700"></div>
+    <button id="themeToggle" class="p-3 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" title="Toggle Theme">
+      <svg id="sunIcon" class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+      <svg id="moonIcon" class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="ml-0 sm:ml-24 p-4 sm:p-8 lg:p-12 pb-24 sm:pb-8 flex-grow max-w-5xl mx-auto sm:mx-0">
+    <header class="mb-8 sm:mb-12 text-center sm:text-left">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">API Documentation</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm sm:text-base">Easily remove image backgrounds using our API</p>
+    </header>
+
+    <section class="space-y-6 sm:space-y-8">
+      <div class="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-white/50 dark:border-gray-700/50">
+        <h3 class="text-xl font-semibold mb-4">1. Remove Background</h3>
+        <p class="mb-4 text-gray-600 dark:text-gray-300">Upload a single or multiple images to remove the background:</p>
+        <pre class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 rounded-2xl overflow-auto text-sm border border-gray-200 dark:border-gray-700">
+POST /remove-bg
+Content-Type: multipart/form-data
+Body: 
+- images: One or more image files
+        </pre>
+      </div>
+
+      <div class="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-white/50 dark:border-gray-700/50 relative">
+        <h3 class="text-xl font-semibold mb-4">Node.js Request Example</h3>
+        <p class="mb-4 text-gray-600 dark:text-gray-300">Here's how to make a request to the API using Node.js:</p>
+        <div class="relative group">
+          <pre id="nodeRequest" class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 sm:p-6 rounded-2xl overflow-auto text-sm leading-relaxed border border-gray-200 dark:border-gray-700">const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+
+async function removeBackground() {
+  const form = new FormData();
+  form.append('images', fs.createReadStream('path/to/your/image.jpg'));
+
+  try {
+    const response = await axios.post('{{backend_url}}/remove-bg', form, {
+      headers: {
+        ...form.getHeaders()
+      },
+      responseType: 'arraybuffer'
+    });
+
+    fs.writeFileSync('output.png', response.data);
+    console.log('Background removed successfully! File saved as output.png');
+  } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
+  }
+}
+
+removeBackground();</pre>
+          <button onclick="copyToClipboard('nodeRequest')" class="absolute top-4 right-4 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm border border-gray-200 dark:border-gray-600 p-2 rounded-full hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0 group-hover:opacity-100">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8m-4-4h4m-8-4h8m-6 8H5m14 4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Theme Management
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Code copied to clipboard!');
+      }).catch((err) => {
+        console.error('Copy failed:', err);
+      });
+    }
+  </script>
+</body>
+
+</html>

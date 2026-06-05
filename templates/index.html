@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clear Cut</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            'cc-bg': '#f3f4f6',
+            'cc-dark-bg': '#111827',
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      background-color: theme('colors.cc-bg');
+      background-image: url('/static/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .dark body {
+      background-color: theme('colors.cc-dark-bg');
+      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    /* Comparison Slider Styles */
+    .compare-wrapper {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 75%;
+      /* 4:3 aspect ratio */
+      overflow: hidden;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .compare-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .compare-img-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      clip-path: inset(0 50% 0 0);
+    }
+
+    .compare-slider-control {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: ew-resize;
+      z-index: 20;
+    }
+
+    .compare-slider-line {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      bottom: 0;
+      width: 2px;
+      background: white;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .compare-slider-thumb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .compare-slider-thumb::before,
+    .compare-slider-thumb::after {
+      content: '';
+      border: solid #666;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+    }
+
+    .compare-slider-thumb::before {
+      transform: rotate(135deg);
+      margin-right: 2px;
+    }
+
+    .compare-slider-thumb::after {
+      transform: rotate(-45deg);
+      margin-left: 2px;
+    }
+
+    .checkerboard {
+      background-color: #e5e7eb;
+      background-image:
+        linear-gradient(45deg, #d1d5db 25%, transparent 25%),
+        linear-gradient(-45deg, #d1d5db 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #d1d5db 75%),
+        linear-gradient(-45deg, transparent 75%, #d1d5db 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    .dark .checkerboard {
+      background-color: #374151;
+      background-image:
+        linear-gradient(45deg, #1f2937 25%, transparent 25%),
+        linear-gradient(-45deg, #1f2937 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1f2937 75%),
+        linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+    }
+
+    .loader {
+      border-top-color: #000;
+      animation: spinner 1.5s linear infinite;
+    }
+
+    .dark .loader {
+      border-top-color: #fff;
+    }
+
+    @keyframes spinner {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="text-gray-900 dark:text-gray-100 min-h-screen flex transition-colors duration-300">
+
+  <!-- Left/Bottom Navigation Pill -->
+  <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:bottom-auto sm:left-4 sm:translate-x-0 sm:top-1/2 sm:-translate-y-1/2 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-full shadow-lg p-3 flex flex-row sm:flex-col gap-4 sm:gap-6 z-50 border border-white/30 dark:border-gray-700/50">
+    <a href="/" class="p-3 rounded-full bg-black text-white dark:bg-white dark:text-black shadow-md transition-colors"
+      title="Home">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+        </path>
+      </svg>
+    </a>
+    <a href="/api-docs"
+      class="p-3 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+      title="API Docs">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4">
+        </path>
+      </svg>
+    </a>
+    <div class="hidden sm:block h-px w-full bg-gray-200 dark:bg-gray-700"></div>
+    <div class="block sm:hidden w-px h-full bg-gray-200 dark:bg-gray-700"></div>
+    <button id="themeToggle"
+      class="p-3 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+      title="Toggle Theme">
+      <svg id="sunIcon" class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+        </path>
+      </svg>
+      <svg id="moonIcon" class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="ml-0 sm:ml-24 p-4 sm:p-8 pb-24 sm:pb-8 flex-grow flex flex-col items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-4xl space-y-6 sm:space-y-8">
+
+      <!-- Workspace Card -->
+      <div
+        class="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-white/50 dark:border-gray-700/50 w-full">
+
+        <!-- Controls Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <button id="uploadTrigger"
+              class="px-4 py-2 sm:px-5 sm:py-2.5 bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 rounded-full font-medium transition-colors text-sm flex items-center gap-2 shadow-sm border border-gray-200 dark:border-gray-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+              </svg>
+              Select Image(s)
+            </button>
+            <input type="file" id="fileInput" class="hidden" multiple accept="image/*">
+
+            <div id="bgColorControl"
+              class="hidden flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-white/80 dark:bg-gray-700/80 rounded-full text-sm shadow-sm border border-gray-200 dark:border-gray-600">
+              <span class="font-medium">Bg Color:</span>
+              <input type="color" id="bgColorPicker" class="w-6 h-6 rounded cursor-pointer border-0 p-0"
+                value="#ffffff">
+              <button id="bgTransparentBtn"
+                class="ml-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 font-medium">Clear</button>
+            </div>
+          </div>
+
+          <button id="exportButton"
+            class="hidden px-5 py-2.5 bg-black text-white dark:bg-white dark:text-black hover:opacity-90 rounded-full font-medium transition-opacity text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Export
+          </button>
+        </div>
+
+        <!-- Dropzone (Initial State) -->
+        <div id="dropZone"
+          class="border-2 border-dashed border-gray-400 dark:border-gray-500 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-6 sm:p-12 text-center hover:border-gray-600 dark:hover:border-gray-400 transition-colors cursor-pointer group">
+          <div class="flex flex-col items-center gap-4">
+            <div
+              class="w-16 h-16 bg-white/80 dark:bg-gray-700/80 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-8 h-8 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-lg font-medium text-gray-700 dark:text-gray-200">Drag & drop your images here</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">or click to browse</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Area (Selected images before processing) -->
+        <div id="previewArea" class="hidden space-y-6">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-medium">Ready to Process</h3>
+            <button id="clearSelectionBtn" class="text-sm text-red-500 hover:text-red-600 font-medium">Clear</button>
+          </div>
+          <div id="previewGrid"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-64 overflow-y-auto p-2">
+            <!-- Image previews will be injected here -->
+          </div>
+          <div class="flex justify-center pt-2 sm:pt-4">
+            <button id="processButton"
+              class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 rounded-full font-semibold transition-all transform hover:scale-105 shadow-md flex justify-center items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+                </path>
+              </svg>
+              Remove Background
+            </button>
+          </div>
+        </div>
+
+        <!-- Processing Status -->
+        <div id="processingStatus" class="hidden text-center py-16">
+          <div class="loader mx-auto h-12 w-12 border-4 border-gray-200 rounded-full"></div>
+          <p class="mt-6 text-lg font-medium text-gray-700 dark:text-gray-200">Processing images...</p>
+        </div>
+
+        <!-- Results Area -->
+        <div id="resultArea" class="hidden space-y-6">
+
+          <div id="sliderContainer" class="compare-wrapper checkerboard rounded-[1.5rem]">
+            <!-- Background Color Layer -->
+            <div id="sliderBgColor" class="absolute inset-0 bg-transparent rounded-[1.5rem]"></div>
+
+            <img id="processedImg" class="compare-img" src="" alt="Processed">
+            <img id="originalImg" class="compare-img-overlay" src="" alt="Original">
+
+            <input type="range" min="0" max="100" value="50" class="compare-slider-control" id="slider">
+            <div class="compare-slider-line" id="sliderLine"></div>
+            <div class="compare-slider-thumb" id="sliderThumb"></div>
+          </div>
+
+          <p class="text-center text-sm text-gray-500">Drag the slider to compare original and processed image.</p>
+        </div>
+
+        <!-- Batch Results List -->
+        <div id="batchResultsArea" class="hidden mt-8">
+          <h3 class="text-lg font-medium mb-4">Batch Processed Files:</h3>
+          <div class="flex flex-wrap gap-4" id="batchFileList">
+            <!-- Files will be injected here -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Theme Management
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+    });
+
+    // Elements
+    const dropZone = document.getElementById('dropZone');
+    const uploadTrigger = document.getElementById('uploadTrigger');
+    const fileInput = document.getElementById('fileInput');
+    const previewArea = document.getElementById('previewArea');
+    const previewGrid = document.getElementById('previewGrid');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    const processButton = document.getElementById('processButton');
+    const processingStatus = document.getElementById('processingStatus');
+    const resultArea = document.getElementById('resultArea');
+    const exportButton = document.getElementById('exportButton');
+    const bgColorControl = document.getElementById('bgColorControl');
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    const bgTransparentBtn = document.getElementById('bgTransparentBtn');
+    const sliderBgColor = document.getElementById('sliderBgColor');
+    const originalImg = document.getElementById('originalImg');
+    const processedImg = document.getElementById('processedImg');
+    const slider = document.getElementById('slider');
+    const sliderLine = document.getElementById('sliderLine');
+    const sliderThumb = document.getElementById('sliderThumb');
+    const batchResultsArea = document.getElementById('batchResultsArea');
+    const batchFileList = document.getElementById('batchFileList');
+
+    let selectedFilesArray = [];
+    let processedBlobUrl = null;
+    let isZip = false;
+
+    // Drag & Drop
+    dropZone.addEventListener('click', () => fileInput.click());
+    uploadTrigger.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-gray-500', 'dark:border-gray-400');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-gray-500', 'dark:border-gray-400');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-gray-500', 'dark:border-gray-400');
+      if (e.dataTransfer.files.length > 0) {
+        handleFilesSelection(e.dataTransfer.files);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFilesSelection(e.target.files);
+      }
+    });
+
+    function handleFilesSelection(files) {
+      selectedFilesArray = Array.from(files);
+
+      // Reset views
+      dropZone.classList.add('hidden');
+      resultArea.classList.add('hidden');
+      batchResultsArea.classList.add('hidden');
+      exportButton.classList.add('hidden');
+      bgColorControl.classList.add('hidden');
+
+      // Render Previews
+      previewGrid.innerHTML = '';
+      selectedFilesArray.forEach(file => {
+        const objUrl = URL.createObjectURL(file);
+        const imgDiv = document.createElement('div');
+        imgDiv.className = 'relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square';
+        imgDiv.innerHTML = `<img src="${objUrl}" class="w-full h-full object-cover" alt="Preview">`;
+        previewGrid.appendChild(imgDiv);
+      });
+
+      previewArea.classList.remove('hidden');
+    }
+
+    clearSelectionBtn.addEventListener('click', () => {
+      selectedFilesArray = [];
+      fileInput.value = '';
+      previewArea.classList.add('hidden');
+      dropZone.classList.remove('hidden');
+    });
+
+    processButton.addEventListener('click', async () => {
+      if (selectedFilesArray.length === 0) return;
+
+      previewArea.classList.add('hidden');
+      processingStatus.classList.remove('hidden');
+
+      const formData = new FormData();
+      for (let file of selectedFilesArray) {
+        formData.append('images', file);
+      }
+
+      // Keep track of the first image for preview if it's a single upload
+      if (selectedFilesArray.length === 1) {
+        originalImg.src = URL.createObjectURL(selectedFilesArray[0]);
+      } else {
+        originalImg.src = '';
+      }
+
+      try {
+        const response = await fetch('/remove-bg', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          processedBlobUrl = URL.createObjectURL(blob);
+
+          if (blob.type === 'application/zip') {
+            isZip = true;
+            resultArea.classList.add('hidden');
+            batchResultsArea.classList.remove('hidden');
+            exportButton.classList.remove('hidden');
+
+            batchFileList.innerHTML = `
+               <div class="px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-between w-full border border-gray-200 dark:border-gray-600">
+                 <span class="font-medium">${selectedFilesArray.length} images processed successfully</span>
+                 <span class="text-sm text-gray-500">ZIP archive</span>
+               </div>
+             `;
+          } else {
+            isZip = false;
+            processedImg.src = processedBlobUrl;
+            resultArea.classList.remove('hidden');
+            exportButton.classList.remove('hidden');
+            bgColorControl.classList.remove('hidden');
+
+            // Reset slider
+            slider.value = 50;
+            updateSlider();
+          }
+        } else {
+          alert('Processing failed. Please try again.');
+          dropZone.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('An error occurred.');
+        dropZone.classList.remove('hidden');
+      } finally {
+        processingStatus.classList.add('hidden');
+        selectedFilesArray = []; // clear after processing
+        fileInput.value = ''; // reset
+      }
+    });
+
+    // Export button
+    exportButton.addEventListener('click', () => {
+      if (processedBlobUrl) {
+        const link = document.createElement('a');
+        link.href = processedBlobUrl;
+        link.download = isZip ? 'clearcut_batch.zip' : 'clearcut_result.png';
+        link.click();
+      }
+    });
+
+    // Background color
+    bgColorPicker.addEventListener('input', (e) => {
+      sliderBgColor.style.backgroundColor = e.target.value;
+    });
+
+    bgTransparentBtn.addEventListener('click', () => {
+      sliderBgColor.style.backgroundColor = 'transparent';
+    });
+
+    // Comparison Slider Logic
+    function updateSlider() {
+      const val = slider.value;
+      originalImg.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+      sliderLine.style.left = `${val}%`;
+      sliderThumb.style.left = `${val}%`;
+    }
+
+    slider.addEventListener('input', updateSlider);
+
+  </script>
+</body>
+
+</html>
