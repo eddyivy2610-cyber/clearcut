@@ -11,7 +11,6 @@ load_dotenv()
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max limit
 
-UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
 
 @app.route('/')
 def index():
@@ -27,18 +26,7 @@ def api_docs():
     backend_url = request.host_url.rstrip('/')
     return render_template('api.html', backend_url=backend_url)
 
-@app.route('/get-random-images')
-def get_random_images():
-    try:
-        url = f"https://api.unsplash.com/photos/random?query=headshot&count=4&client_id={UNSPLASH_ACCESS_KEY}"
-        response = requests.get(url)
-        response.raise_for_status()
-        images = response.json()
-        image_urls = [img['urls']['regular'] for img in images]
-        return jsonify(image_urls)
-    except Exception as e:
-        print(f"Error fetching images: {e}")
-        return jsonify({"error": "Failed to fetch images"}), 500
+
 
 @app.route('/remove-bg', methods=['POST'])
 def remove_bg():
