@@ -2,6 +2,7 @@ services:
   - type: web
     name: clear-cut
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
     envVars:
