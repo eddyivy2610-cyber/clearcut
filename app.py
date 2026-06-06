@@ -11,6 +11,9 @@ load_dotenv()
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max limit
 
+# Initialize the rembg session globally to save memory
+model_session = new_session(model_name='u2netp')
+
 
 @app.route('/')
 def index():
@@ -44,7 +47,7 @@ def remove_bg():
 
         try:
             input_image = file.read()
-            output_image = remove(input_image, session=new_session(model_name='u2netp'))
+            output_image = remove(input_image, session=model_session)
             output_path = os.path.join(temp_dir, f"output_{os.path.splitext(file.filename)[0]}.png")
             with open(output_path, "wb") as f:
                 f.write(output_image)
