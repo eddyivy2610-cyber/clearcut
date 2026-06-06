@@ -151,12 +151,7 @@
     }
 
     .loader {
-      border-top-color: #000;
       animation: spinner 1.5s linear infinite;
-    }
-
-    .dark .loader {
-      border-top-color: #fff;
     }
 
     @keyframes spinner {
@@ -293,7 +288,7 @@
 
         <!-- Processing Status -->
         <div id="processingStatus" class="hidden text-center py-16">
-          <div class="loader mx-auto h-12 w-12 border-4 border-gray-200 rounded-full"></div>
+          <div class="loader mx-auto h-12 w-12 border-4 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-white rounded-full"></div>
           <p class="mt-6 text-lg font-medium text-gray-700 dark:text-gray-200">Processing images...</p>
         </div>
 
