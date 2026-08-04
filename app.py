@@ -29,6 +29,12 @@ def api_docs():
     backend_url = request.host_url.rstrip('/')
     return render_template('api.html', backend_url=backend_url)
 
+@app.route('/upload')
+def upload():
+    backend_url = request.host_url.rstrip('/')
+    return render_template('upload.html', backend_url=backend_url)
+
+
 
 
 @app.route('/remove-bg', methods=['POST'])

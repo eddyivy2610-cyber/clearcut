@@ -336,6 +336,19 @@ The application is configured for one-click deployment on Render.com:
 3. **Set environment variables** in Render dashboard
 4. **Deploy automatically** on code push
 
+#### ⏰ Keeping Render Instance Awake with UptimeRobot
+
+Render free web services automatically spin down after 15 minutes of inactivity. You can use **UptimeRobot** (free) to ping the lightweight `/health` endpoint every 5–10 minutes to keep your app awake 24/7:
+
+1. Go to [UptimeRobot.com](https://uptimerobot.com/) and create a free account.
+2. Click **+ Add New Monitor**.
+3. Set **Monitor Type**: `HTTP(s)`
+4. Set **Friendly Name**: `Clear Cut Render` (or your preferred name)
+5. Set **URL (or IP)**: `https://<your-render-app>.onrender.com/health` (e.g. `https://remove-bg-rv88.onrender.com/health`)
+6. Set **Monitoring Interval**: `Every 5 minutes` (or `Every 10 minutes`)
+7. Click **Create Monitor**.
+
+
 ### Manual Production Deployment
 
 1. **Prepare the environment**:
