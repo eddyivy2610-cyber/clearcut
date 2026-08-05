@@ -37,6 +37,22 @@ def upload():
 
 
 
+import io
+from PIL import Image
+
+def optimize_image_for_processing(image_bytes, max_dim=1920):
+    """Downscale large images to max_dim to keep memory usage under Render 512MB limit."""
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+        output_buffer = io.BytesIO()
+        # Save as PNG or JPEG depending on mode
+        img.save(output_buffer, format=img.format or 'PNG')
+        return output_buffer.getvalue()
+    except Exception as e:
+        print(f"Image optimization warning: {e}")
+        return image_bytes
+
 @app.route('/remove-bg', methods=['POST'])
 def remove_bg():
     if 'images' not in request.files:
@@ -53,11 +69,13 @@ def remove_bg():
 
         try:
             input_image = file.read()
-            output_image = remove(input_image, session=model_session)
+            optimized_image = optimize_image_for_processing(input_image)
+            output_image = remove(optimized_image, session=model_session)
             output_path = os.path.join(temp_dir, f"output_{os.path.splitext(file.filename)[0]}.png")
             with open(output_path, "wb") as f:
                 f.write(output_image)
             output_files.append(output_path)
+
         except Exception as e:
             print(f"Error processing file {file.filename}: {e}")
             continue
